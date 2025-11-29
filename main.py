@@ -60,6 +60,11 @@ while True:
     platform.draw()
     for block in blocks:
         block.draw()
+        if ball.colliderect(block):
+            dy*=-1
+            blocks.remove(block)
+            block.fill()
+        
 
     event = pygame.event.wait()
     if event.type == pygame.QUIT:
@@ -67,9 +72,12 @@ while True:
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_RIGHT:
             move_right = True
+        
     if event.type == pygame.KEYUP:
         if event.key == pygame.K_RIGHT:
             move_right = False
+
+        
     if move_right:
         platform.rect.x += 5
     ball.rect.x += dx
