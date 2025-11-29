@@ -19,17 +19,22 @@ class Area():
         pygame.draw.rect(mw, self.color, self.rect,)
     def outline(self, frame_color, thickness):
         pygame.draw.rect(mw, frame_color, self.rect, thickness)
+    def collidepoint(self, x, y):
+        return self.rect.collidepoint(x, y)
+    def colliderect(self, rect):
+        return self.rect.colliderect(rect.rect)
 
 class Picture(Area):
     def __init__(self, filename, x, y, widht, height, color):
         Area.__init__(self, x, y, widht, height, color)
-        self.image  = pygame.transform.scale(pygame.image.load(filename), (widht, height))
+        self.image  = pygame.transform.scale(pygame.image.load(filename), (widht-10, height-10))
 
     def draw(self):
-        mw.blit(self.image, (self.rect.x, self.rect.y))
+        self.fill()
+        mw.blit(self.image, (self.rect.x+5, self.rect.y+5))
 
-ball = Picture('ball.png', 100, 100, 50, 50, RED)
-platform = Picture('plat.png', 200, 200, 100, 30, RED)
+ball = Picture('ball.png', 200, 350, 50, 50, LIGHT_BLUE)
+platform = Picture('plat.png', 200, 450, 100, 30, LIGHT_BLUE)
 x, y = 10, 10
 x_shift = 25
 count = 8
@@ -38,7 +43,7 @@ blocks = list()
 
 for j in range(lines):
     for i in range(count):
-        block = Picture('block.jfif', x, y, 55, 55, RED)
+        block = Picture('block.jfif', x, y, 55, 55, LIGHT_BLUE)
         x += 60
         blocks.append(block)
     x = 10 
@@ -47,6 +52,9 @@ for j in range(lines):
     y += 60
     count -= 1
 
+dy, dx = 5, 5
+move_right = False
+move_left = False
 while True:
     ball.draw()
     platform.draw()
@@ -56,5 +64,22 @@ while True:
     event = pygame.event.wait()
     if event.type == pygame.QUIT:
         break
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_RIGHT:
+            move_right = True
+    if event.type == pygame.KEYUP:
+        if event.key == pygame.K_RIGHT:
+            move_right = False
+    if move_right:
+        platform.rect.x += 5
+    ball.rect.x += dx
+    ball.rect.y += dy
+    if ball.colliderect(platform):
+        dy *= -1
+    if ball.rect.x < 0 or ball.rect.x > 450:
+        dx *= -1
+    if ball.rect.y < 0:
+        dy *= -1
+        
     pygame.display.update()
     clock.tick(40)
